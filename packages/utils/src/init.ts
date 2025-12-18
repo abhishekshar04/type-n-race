@@ -4,8 +4,7 @@ export function initTypingState(text: string): TypingState {
   return {
     text,
     currentIndex: 0,
-    correct: 0,
-    incorrect: 0,
+    charStates: Array(text.length).fill("pending"),
     startedAt: null,
     endedAt: null
   };

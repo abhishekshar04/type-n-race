@@ -4,51 +4,47 @@ export function applyKey(
   state: TypingState,
   key: string
 ): TypingState {
+  if (state.endedAt !== null) return state;
+  if (key.length > 1 && key !== "Backspace") return state;
 
-    if (state.endedAt !== null) return state;
+  let { currentIndex, charStates, startedAt } = state;
 
-    if (key.length > 1 && key !== "Backspace") return state;
+  // Start timer
+  if (startedAt === null && key !== "Backspace") {
+    startedAt = Date.now();
+  }
 
-    let { currentIndex, correct, incorrect, startedAt } = state;
+  // Handle backspace
+  if (key === "Backspace") {
+    if (currentIndex === 0) return state;
 
-    if (startedAt === null && key !== "Backspace") {
-        startedAt = Date.now();
-    }
-
-    if (key === "Backspace") {
-        if (currentIndex === 0) return state;
-
-        const prevChar = state.text[currentIndex - 1];
-        const wasCorrect = prevChar === state.text[currentIndex - 1];
-
-        currentIndex--;
-
-        return {
-        ...state,
-        currentIndex,
-        startedAt
-        };
-    }
-
-    const expectedChar = state.text[currentIndex];
-
-    if (key === expectedChar) {
-        correct++;
-    } else {
-        incorrect++;
-    }
-
-    currentIndex++;
-
-    const endedAt =
-        currentIndex === state.text.length ? Date.now() : null;
+    const newCharStates = [...charStates];
+    newCharStates[currentIndex - 1] = "pending";
 
     return {
-        ...state,
-        currentIndex,
-        correct,
-        incorrect,
-        startedAt,
-        endedAt
+      ...state,
+      currentIndex: currentIndex - 1,
+      charStates: newCharStates,
+      startedAt
     };
+  }
+
+  const expectedChar = state.text[currentIndex];
+  const newCharStates = [...charStates];
+
+  newCharStates[currentIndex] =
+    key === expectedChar ? "correct" : "incorrect";
+
+  currentIndex++;
+
+  const endedAt =
+    currentIndex === state.text.length ? Date.now() : null;
+
+  return {
+    ...state,
+    currentIndex,
+    charStates: newCharStates,
+    startedAt,
+    endedAt
+  };
 }
