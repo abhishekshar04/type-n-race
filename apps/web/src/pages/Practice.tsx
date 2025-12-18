@@ -13,6 +13,9 @@ export default function Practice() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Practice</h1>
+      <p className="text-sm text-muted-foreground">
+        Start typing to begin the test
+      </p>
 
       <TypingText
         text={state.text}
@@ -20,6 +23,11 @@ export default function Practice() {
         currentIndex={state.currentIndex}
       />
 
+      {finished && (
+        <p className="text-sm text-muted-foreground">
+          Test completed. Press restart to try again.
+        </p>
+      )}
 
       {finished && (
         <div className="flex gap-6">

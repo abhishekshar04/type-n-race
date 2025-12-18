@@ -21,12 +21,15 @@ export default function TypingText({
         } else if (charStates[idx] === "incorrect") {
           className = "text-red-500";
         } else if (idx === currentIndex) {
-          className = "bg-yellow-200 text-black";
+          className = "border-b-2 border-yellow-500 text-foreground";
         }
+
+
+        const displayChar = char === " " ? " " : char;
 
         return (
           <span key={idx} className={className}>
-            {char}
+            {displayChar}
           </span>
         );
       })}

@@ -12,9 +12,16 @@ export function useTyping(text: string) {
   );
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.ctrlKey || e.metaKey) return;
-    if (e.key === "Tab") e.preventDefault();
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
 
+    const isValidKey =
+    e.key.length === 1 || e.key === "Backspace";
+
+    if (!isValidKey) {
+    e.preventDefault();
+    return;
+    }
+    
     setState((prev) => applyKey(prev, e.key));
   }, []);
 
