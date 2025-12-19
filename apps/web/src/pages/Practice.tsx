@@ -1,44 +1,50 @@
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import TypingText from "@/components/TypingText";
 import { useTyping } from "@/hooks/useTyping";
-import TypingText from "@/components/TypingTest";
-
-const SAMPLE_TEXT =
-  "The quick brown fox jumps over the lazy dog.";
-
+import { typingTexts } from "@/data/typingTexts";
+import TypingWorkspace from "@/components/TypingWorkspace";
+import TypingStats from "@/components/TypingStats";
 export default function Practice() {
-  const { state, stats, reset } = useTyping(SAMPLE_TEXT);
+  const [selectedId, setSelectedId] = useState(
+    typingTexts[0].id
+  );
 
+  const selectedText =
+    typingTexts.find((t) => t.id === selectedId)!.text;
+
+  const { state, stats, reset } = useTyping(selectedText);
   const finished = state.endedAt !== null;
-
+  const progress =
+  (state.currentIndex / state.text.length) * 100;
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Practice</h1>
-      <p className="text-sm text-muted-foreground">
-        Start typing to begin the test
-      </p>
-
+    <div className="space-y-10">
+      {/* Header */}
+          <TypingWorkspace
+      textIndex={1}
+      totalTexts={typingTexts.length}
+      progress={progress}
+      onRestart={reset}
+      onNewText={() => {
+        const next =
+          (typingTexts.findIndex(t => t.id === selectedId) + 1) %
+          typingTexts.length;
+        setSelectedId(typingTexts[next].id);
+      }}
+    >
       <TypingText
         text={state.text}
         charStates={state.charStates}
         currentIndex={state.currentIndex}
+        isStarted={state.startedAt !== null}
       />
-
-      {finished && (
-        <p className="text-sm text-muted-foreground">
-          Test completed. Press restart to try again.
-        </p>
-      )}
-
-      {finished && (
-        <div className="flex gap-6">
-          <div>WPM: {stats.wpm}</div>
-          <div>Accuracy: {stats.accuracy}%</div>
-        </div>
-      )}
-
-      <Button onClick={reset} variant="outline">
-        Restart
-      </Button>
+    </TypingWorkspace>
+    <TypingStats
+      wpm={stats.wpm}
+      accuracy={stats.accuracy}
+      errors={
+        state.charStates.filter(c => c === "incorrect").length
+      }
+    />
     </div>
   );
 }
